@@ -340,7 +340,7 @@ func (o LVOpts) Flags() (opts []string) {
 // If sizeInBytes is zero the entire available space is allocated.
 //
 // Additional optional config items can be specified using CreateLogicalVolumeOpt
-func (vg *VolumeGroup) CreateLogicalVolume(name string, sizeInBytes uint64, tags []string, optFns ...CreateLogicalVolumeOpt) (*LogicalVolume, error) {
+func(vg *VolumeGroup) CreateLogicalVolume(name string, sizeInBytes uint64, tags []string, defaultYes bool, optFns ...CreateLogicalVolumeOpt) (*LogicalVolume, error) {
 	if err := ValidateLogicalVolumeName(name); err != nil {
 		return nil, err
 	}
@@ -364,6 +364,9 @@ func (vg *VolumeGroup) CreateLogicalVolume(name string, sizeInBytes uint64, tags
 		}
 	}
 	args = append(args, opts.Flags()...)
+    if defaultYes {
+        args = append(args, "-y")
+    }
 	if err := run("lvcreate", nil, args...); err != nil {
 		if isInsufficientSpace(err) {
 			return nil, ErrNoSpace
